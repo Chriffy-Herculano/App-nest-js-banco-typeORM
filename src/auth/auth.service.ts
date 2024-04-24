@@ -3,6 +3,9 @@ import { JwtService } from "@nestjs/jwt";
 import { UserService } from "src/user/user.service";
 import * as bcrypt from 'bcrypt';
 import { MailerService } from "@nestjs-modules/mailer";
+import { UserEntity } from "src/user/entity/user.entity";
+import { InjectRepository } from "@nestjs/typeorm";
+import { Repository } from "typeorm";
 
 @Injectable()
 export class AuthService {
@@ -13,10 +16,12 @@ export class AuthService {
     constructor(
         private readonly jwtService: JwtService,
         private readonly userService: UserService,
-        private readonly mailer: MailerService
+        private readonly mailer: MailerService,
+        @InjectRepository(UserEntity)
+        private usersRepository: Repository<UserEntity>
     ) {}
 
-    createToken(user: User) {
+    createToken(user: UserEntity) {
         return {
             accessToken: this.jwtService.sign({
                 id: user.id,
@@ -55,10 +60,7 @@ export class AuthService {
 
     async login(email: string, password: string) {
 
-        //console.log(process.env)
-
-        // Procura o usuario pelo e-mail
-        const user = await this.prisma.user.findFirst({
+        const user = await this.usersRepository.findOne({
             where: {
                 email
             }
@@ -79,10 +81,8 @@ export class AuthService {
 
     // recuperação de senha
     async forget(email: string) {
-        const user = await this.prisma.user.findFirst({
-            where: {
-                email
-            }
+        const user = await this.usersRepository.findOneBy({
+            email
         });
 
         if(!user){
@@ -128,14 +128,11 @@ export class AuthService {
             password = await bcrypt.hash(password, salt);
 
             // atualiza a senha do usuario com o id passado
-            const user = await this.prisma.user.update({
-                where: {
-                    id: Number(data.id),
-                },
-                data: {
-                    password,
-                },
+            await this.usersRepository.update(Number(data.id), {
+                password
             });
+
+            const user = await this.userService.show(Number(data.id)); // Retornando os dados do usuario editado
 
         return this.createToken(user);
 
