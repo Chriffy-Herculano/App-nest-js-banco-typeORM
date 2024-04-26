@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from "@nestjs/common";
+import { BadRequestException, Injectable, NotFoundException } from "@nestjs/common";
 import { CreateUserDTO } from "./dto/create-user.tdo";
 import { UpdatePutUserDTO } from "./dto/update-put-user.dto";
 import { UpdatePatchUserDTO } from "./dto/update-patch-user.dto";
@@ -17,9 +17,19 @@ export class UserService {
 
     async create(data: CreateUserDTO){
 
+        if(await this.usersRepository.exists({
+            where: {
+                email: data.email
+            }
+        })) {
+            throw new BadRequestException('Este e-mail já está sendo usado!.');
+        }
+
         data.password = await bcrypt.hash(data.password, await bcrypt.genSalt());
 
-        return this.usersRepository.create(data);
+        const user = this.usersRepository.create(data);
+
+        return this.usersRepository.save([user]);
 
     }
 
@@ -46,13 +56,15 @@ export class UserService {
 
         password = await bcrypt.hash(password, salt);
 
-        return this.usersRepository.update(id, {
+        await this.usersRepository.update(id, {
             email, 
             name, 
             password, 
             birthAt: birthAt ? new Date(birthAt) : null, 
             role
         });
+
+        return this.show(id);
     }
 
     async updatePartial(id: number, {email, name, password, birthAt, role}: UpdatePatchUserDTO) {
@@ -82,7 +94,9 @@ export class UserService {
             data.role = role;
         }
 
-        return this.usersRepository.update(id, data)
+        await this.usersRepository.update(id, data)
+
+        return this.show(id);
     }
 
     async delete(id: number) {
