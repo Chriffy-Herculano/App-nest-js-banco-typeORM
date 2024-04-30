@@ -50,7 +50,7 @@ import { UserEntity } from './user/entity/user.entity';
       port: Number(process.env.DB_PORT),
       username: process.env.DB_USERNAME,
       password: process.env.DB_PASSWORD,
-      database: process.env.DB_TADABASE,
+      database: process.env.DB_DATABASE,
       entities: [UserEntity],
       synchronize: process.env.ENV === 'development' // Tomar cuidado, ele reflete o que esta nas entidades ao banco.
     })

@@ -15,12 +15,12 @@ export class Migrate1714092171326 implements MigrationInterface {
             },{
                 name: 'name',
                 type: 'varchar',
-                length: '63'
+                length: '63',
             }, {
                 name: 'email',
                 type: 'varchar',
                 length: '127',
-                isUnique: true
+                isUnique: true,
             }, {
                 name: 'password',
                 type: 'varchar',
