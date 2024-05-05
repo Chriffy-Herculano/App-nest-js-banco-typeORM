@@ -1,6 +1,5 @@
 import { Controller, Post, Body, UseGuards, UseInterceptors, UploadedFile, BadRequestException, UploadedFiles, ParseFilePipe, FileTypeValidator, MaxFileSizeValidator} from "@nestjs/common";
 import { AuthLoginDTO } from "./dto/auth-login.dto";
-//import { AuthRegisterDTO } from "./dto/auth-register.dto";
 import { AuthResetDTO } from "./dto/auth-reset.dto";
 import { AuthForgetDTO } from "./dto/auth-forget.dto";
 import { AuthService } from "./auth.service";
@@ -10,6 +9,7 @@ import { UserService } from "../user/user.service";
 import { FileService } from "../file/file.service";
 import { AuthGuard } from "../guards/auth.guard";
 import { User } from "../decorators/user.decorator";
+import { AuthRegisterDTO } from "./dto/auth-register.dto";
 
 
 @Controller('auth')
@@ -28,10 +28,10 @@ export class AuthController {
         return this.authService.login(email, password);
     }
 
-    // @Post('register')
-    // async register(@Body() body: AuthRegisterDTO) {
-    //     return this.authService.register(body);
-    // }
+    @Post('register')
+    async register(@Body() body: AuthRegisterDTO) {
+        return this.authService.register(body);
+    }
 
     @Post('forget')
     async forget(@Body() {email}: AuthForgetDTO) {

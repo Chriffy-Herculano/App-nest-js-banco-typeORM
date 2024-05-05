@@ -6,6 +6,7 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import { UserService } from "../user/user.service";
 import { UserEntity } from "../user/entity/user.entity";
+import { AuthRegisterDTO } from "./dto/auth-register.dto";
 
 @Injectable()
 export class AuthService {
@@ -60,10 +61,8 @@ export class AuthService {
 
     async login(email: string, password: string) {
 
-        const user = await this.usersRepository.findOne({
-            where: {
-                email
-            }
+        const user = await this.usersRepository.findOneBy({
+            email
         });
 
         // Se não achar cai na excessão
@@ -143,10 +142,13 @@ export class AuthService {
         
     }
 
-    //async register(data: AuthRegisterDTO) {
-        
-        //const user = await this.userService.create(data);
+    //VOLTAR ESTA COM ERRO
+    async register(data: AuthRegisterDTO) {
 
-        //return this.createToken(user);
-    //}
+        delete data.role;
+        
+        const user = await this.userService.create(data);
+
+        return this.createToken(user);
+    }
 }
