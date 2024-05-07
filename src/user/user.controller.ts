@@ -12,7 +12,7 @@ import { UpdatePatchUserDTO } from "./dto/update-patch-user.dto";
 //import { SkipThrottle, Throttle } from "@nestjs/throttler";
 
 @Roles(Role.Admin)
-@UseGuards(AuthGuard, RoleGuard)
+@UseGuards(AuthGuard, RoleGuard) //Valida se esta autenticado / qual permissão esse usuario autenticado tem
 @UseInterceptors(LogInterceptor)
 @Controller('users')
 export class UserController {
@@ -62,6 +62,8 @@ export class UserController {
     
     @Delete(':id') //estou apenas pegando o id e transformando ele em number usando o ParseIntPipe
     async delete(@ParamId() id: number) {
-        return this.userService.delete(id);
+        return {
+            success: await this.userService.delete(id),
+        };
     }
 }
