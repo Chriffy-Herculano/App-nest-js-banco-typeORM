@@ -4,12 +4,13 @@ import { AuthResetDTO } from "./dto/auth-reset.dto";
 import { AuthForgetDTO } from "./dto/auth-forget.dto";
 import { AuthService } from "./auth.service";
 import { FileFieldsInterceptor, FileInterceptor, FilesInterceptor } from "@nestjs/platform-express";
-import { join } from "path";
-import { UserService } from "../user/user.service";
+//import { join } from "path";
+//import { UserService } from "../user/user.service";
 import { FileService } from "../file/file.service";
 import { AuthGuard } from "../guards/auth.guard";
 import { User } from "../decorators/user.decorator";
 import { AuthRegisterDTO } from "./dto/auth-register.dto";
+import { UserEntity } from "../user/entity/user.entity";
 
 
 @Controller('auth')
@@ -18,7 +19,6 @@ export class AuthController {
 
     //injetando serviços a classe
     constructor(
-        private readonly userService: UserService,
         private readonly authService: AuthService,
         private readonly fileService: FileService
     ) {}
@@ -46,8 +46,8 @@ export class AuthController {
     // quando o request chegar eu tenho os dados do usuario
     @UseGuards(AuthGuard)
     @Post('me')
-    async me(@User() user) {
-        return {user};
+    async me(@User() user: UserEntity) {
+        return user;
     }
 
     // Rota para upload
@@ -55,7 +55,7 @@ export class AuthController {
     @UseGuards(AuthGuard)
     @Post('photo')
     async uploadPhoto(
-        @User() user, 
+        @User() user: UserEntity, 
         @UploadedFile(new ParseFilePipe({ //validando upload usando Pipes
             validators: [
                 new FileTypeValidator({fileType: 'image/png'}),
@@ -73,7 +73,7 @@ export class AuthController {
             throw new BadRequestException(e)
         }
 
-        return {photo};
+        return photo;
     }
 
     // upload de varios arquivos

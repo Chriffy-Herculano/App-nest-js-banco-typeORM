@@ -16,6 +16,8 @@ export class FileService {
         const path: PathLike = join(this.getDestinationPath(), filename);
         
         //faz o upload do arquivo para o sistema usando wrieFile
-        return writeFile(path, file.buffer)
+        await writeFile(path, file.buffer);
+
+        return path;
     }
 }

@@ -72,7 +72,7 @@ describe('AuthService', () => {
         test('forget method', async () => {
             const result = await authService.forget('chriffyteste@gmail.com');
 
-            expect(result).toEqual(true);
+            expect(result).toEqual({success: true});
         });
 
         //VOLTAR ESTA COM ERRO
