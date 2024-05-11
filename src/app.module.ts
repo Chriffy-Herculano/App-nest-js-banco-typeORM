@@ -12,14 +12,18 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { UserEntity } from './user/entity/user.entity';
 
 @Module({
-  imports: [ 
-    ConfigModule.forRoot(),
-    ThrottlerModule.forRoot([{
-      ttl: 60,
-      limit: 3,
-      //ignoreUserAgents: [/google/gi]
-    }]),
-    forwardRef(() => UserModule), 
+  imports: [
+    ConfigModule.forRoot({
+      envFilePath: process.env.ENV === 'test' ? '.env.test' : '.env',
+    }),
+    ThrottlerModule.forRoot([
+      {
+        ttl: 60,
+        limit: 3,
+        //ignoreUserAgents: [/google/gi]
+      },
+    ]),
+    forwardRef(() => UserModule),
     forwardRef(() => AuthModule),
     MailerModule.forRoot({
       //usuario | senha | smpt servidor
@@ -28,9 +32,9 @@ import { UserEntity } from './user/entity/user.entity';
         host: 'smtp.ethereal.email',
         port: 587,
         auth: {
-            user: 'alec.welch@ethereal.email',
-            pass: 'tfy3jz5MS3YsxhveBs'
-        }
+          user: 'alec.welch@ethereal.email',
+          pass: 'tfy3jz5MS3YsxhveBs',
+        },
       },
       defaults: {
         //Nome que vai sair e qual e-mail
@@ -52,14 +56,17 @@ import { UserEntity } from './user/entity/user.entity';
       password: process.env.DB_PASSWORD,
       database: process.env.DB_DATABASE,
       entities: [UserEntity],
-      synchronize: process.env.ENV === 'development' // Tomar cuidado, ele reflete o que esta nas entidades ao banco.
-    })
-  ], 
+      synchronize: process.env.ENV === 'development', // Tomar cuidado, ele reflete o que esta nas entidades ao banco.
+    }),
+  ],
   controllers: [AppController],
-  providers: [AppService, {
-    provide: APP_GUARD, 
-    useClass: ThrottlerGuard
-  }],
-  exports: [AppService]
+  providers: [
+    AppService,
+    {
+      provide: APP_GUARD,
+      useClass: ThrottlerGuard,
+    },
+  ],
+  exports: [AppService],
 })
 export class AppModule {}
